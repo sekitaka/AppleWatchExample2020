@@ -8,10 +8,10 @@
 
 import WatchKit
 import Foundation
-
+import HealthKit
 
 class InterfaceController: WKInterfaceController {
-
+    let healthKitStore = HKHealthStore()
     override func awake(withContext context: Any?) {
         super.awake(withContext: context)
         
@@ -28,4 +28,37 @@ class InterfaceController: WKInterfaceController {
         super.didDeactivate()
     }
 
+    @IBAction func startTapped() {
+        print("start tapped")
+        if(HKHealthStore.isHealthDataAvailable()){
+            print("HealthData AVAILABLE")
+            let readTypes: Set<HKObjectType> = [HKObjectType.quantityType(forIdentifier: .heartRate)!]
+            healthKitStore.requestAuthorization(toShare: nil, read: readTypes) { (isSuccess, err) in
+                if(isSuccess){
+                    print("Authorization SUCCESS")
+                    let sortDescriptors = [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)]
+
+                    let query = HKSampleQuery.init(sampleType: HKObjectType.quantityType(forIdentifier: .heartRate)!, predicate: nil, limit: 1, sortDescriptors: sortDescriptors) { (query, data, error) in
+                        if(error != nil){
+                            print("QUERY FAILED")
+                            print(error)
+                        }
+                        print(data)
+                    }
+                    self.healthKitStore.execute(query)
+                } else {
+                    print("Authorization FAILED")
+                    print (err)
+                }
+            }
+            
+        } else {
+            print("HealthData UMAVAILABLE")
+
+        }
+    }
+    @IBAction func stopTapped() {
+        print("stop tapped")
+
+    }
 }
