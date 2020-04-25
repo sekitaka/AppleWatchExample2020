@@ -116,7 +116,15 @@ class InterfaceController: WKInterfaceController {
 //        guard let endDate = session.endDate else {
 //            return
 //        }
-        let workout = HKWorkout.init(activityType: .running, start: Date.init(timeIntervalSinceNow: -300), end: Date.init())
+
+
+
+
+        let distance = HKQuantity.init(unit: .meter(), doubleValue: 5000.0)
+        let startDate = Date.init(timeIntervalSinceNow: -3600)
+        let endDate = Date.init()
+//        let workout = HKWorkout.init(activityType: .running, start: Date.init(timeIntervalSinceNow: -300), end: Date.init())
+        let workout = HKWorkout.init(activityType: .running, start: startDate , end: endDate, duration: 3600, totalEnergyBurned: nil, totalDistance: distance, metadata: ["name":"Takashi"])
         self.healthStore.save(workout) { (success, error) in
             if success {
                 print("workout save success")
